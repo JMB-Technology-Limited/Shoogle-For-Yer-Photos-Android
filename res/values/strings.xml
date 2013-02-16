@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Shoogle For Yer Photos</string>
+    <string name="menu_next">Next</string>
+    <string name="menu_about">About</string>
+    <string name="splash_button_go">Select a Gallery</string>
+    <string name="splash_button_go_last_viewed_button_prefix">View</string>
+    <string name="splash_button_go_last_viewed_button_postfix">Gallery</string>
+    <string name="about_text">
+		Shoogle For Yer Photos App.
+		\n
+		\nCopyright &#169; 2013 JMB Technology Limited
+		\n
+		\nPlease report any issues to: https://github.com/JMB-Technology-Limited/Shoogle-For-Yer-Photos-Android/issues
+		\n
+		\nSource code: https://github.com/JMB-Technology-Limited/Shoogle-For-Yer-Photos-Android
+	</string>
+	<string name="splash_text">
+	    Select a Gallery on your phone.\n\n
+		Then Shoggle &amp; then Shoggle again!\n\n
+		(If you don\'t want to shoggle use the "next" option in the menu.)
+	</string>
+	<string name="main_text">
+		Now Shoggle &amp; then Shoggle again!\n\n
+		(If you don\'t want to shoggle use the "next" option in the menu.)
+	</string>
+</resources>
