@@ -4,43 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.util.Log;
+
 
 /**
  * 
  * A shake detection library. 
- * To use, have your Activity extend this and override triggerShakeDetected() function.
+ * To use, have your Activity create an instance of the class and set a listener using addListener();
+ * Make sure you call onResume() and onPause() on from the activity
  * 
  * @author James
  * @copyright 2013 JMB Technology Limited
  * @license Open Source; 3-clause BSD 
  */
-public abstract class ShakeDetectActivity extends Activity  implements SensorEventListener {
-
+public class ShakeDetectActivity implements SensorEventListener {
+	
 	SensorManager sensorMgr;
 
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		sensorMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
+	public ShakeDetectActivity(Context context) {
+		sensorMgr = (SensorManager) context.getSystemService(Activity.SENSOR_SERVICE);
 		sensorMgr.registerListener(this,sensorMgr.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
 	}	
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+	public void onResume() {
 		sensorMgr.registerListener(this,sensorMgr.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
 	}
 
-	@Override
-	protected void onPause() {
+	public void onPause() {
 		sensorMgr.unregisterListener(this);
-		super.onPause();
 	}
 
 	private class DataPoint {
@@ -56,8 +51,11 @@ public abstract class ShakeDetectActivity extends Activity  implements SensorEve
 
 	private List<DataPoint> dataPoints = new ArrayList<DataPoint>();
 
-
 	private static final int SHAKE_CHECK_THRESHOLD = 200;
+
+	/**
+	 * After we detect a shake, we ignore any events for a bit of time. We don't want two shakes to close together.
+	 */
 	private static final int IGNORE_EVENTS_AFTER_SHAKE = 1000;
 	private long lastUpdate;
 	private long lastShake = 0;
@@ -146,7 +144,20 @@ public abstract class ShakeDetectActivity extends Activity  implements SensorEve
 		}
 
 	}
+	
+	ArrayList<ShakeDetectActivityListener> listeners = new ArrayList<ShakeDetectActivityListener>();
+	
+	public void addListener(ShakeDetectActivityListener listener) {
+		listeners.add(listener);
+	}
+	
+	protected void triggerShakeDetected() {
+		for(ShakeDetectActivityListener listener: listeners) {
+			listener.shakeDetected();
+		}
+	}
 
-	abstract public void triggerShakeDetected(); 
 
 }
+
+

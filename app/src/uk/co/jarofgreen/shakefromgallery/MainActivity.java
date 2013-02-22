@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Random;
 
 import uk.co.jarofgreen.lib.ShakeDetectActivity;
+import uk.co.jarofgreen.lib.ShakeDetectActivityListener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,11 +34,13 @@ import android.widget.TextView;
  * @copyright 2013 JMB Technology Limited
  * @license Open Source; 3-clause BSD 
  */
-public class MainActivity extends ShakeDetectActivity {
+public class MainActivity extends Activity {
 
 	ImageView mainImageView;
 	Random randomGenerator;
 	TextView mainTextView;
+	
+	ShakeDetectActivity shakeDetectActivity;
 
 	List<String> images = new ArrayList<String>();
 
@@ -58,7 +62,16 @@ public class MainActivity extends ShakeDetectActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
+		shakeDetectActivity = new ShakeDetectActivity(this); 
+		shakeDetectActivity.addListener(new ShakeDetectActivityListener() {
+			@Override
+			public void shakeDetected() {
+				MainActivity.this.triggerShakeDetected();
+				
+			}
+		});
+		
 		mainImageView = (ImageView)findViewById(R.id.imageView);
 		mainTextView = (TextView)findViewById(R.id.mainText);
 
@@ -111,12 +124,14 @@ public class MainActivity extends ShakeDetectActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		shakeDetectActivity.onResume();
 		getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 
 	@Override
 	protected void onPause() {
 		getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		shakeDetectActivity.onPause();
 		super.onPause();
 	}
 
