@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -62,13 +63,15 @@ public class SelectFolderActivity extends Activity {
 	}
 	
 	protected class ImageAdapter extends BaseAdapter {
-	    private Context mContext;
+		protected Context mContext;
+		protected LayoutInflater layoutInflater; 
 
-	    protected List<Gallery> data = new ArrayList<Gallery>();
+		protected List<Gallery> data = new ArrayList<Gallery>();
 		protected List<String> bucketIdList = new ArrayList<String>();
 
-	    public ImageAdapter(Context c) {
-	        mContext = c;
+		public ImageAdapter(Context c) {
+			mContext = c;
+			layoutInflater = (LayoutInflater)c.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 	        
 	        String[] projection = new String[]{
 		            MediaStore.Images.Media.BUCKET_ID,
@@ -114,14 +117,18 @@ public class SelectFolderActivity extends Activity {
 	        return 0;
 	    }
 
-	    // create a new ImageView for each item referenced by the Adapter
 	    public View getView(int position, View convertView, ViewGroup parent) {
-	        TextView textView = new TextView(mContext);
-	        
+	    	View view;
+	    	if (convertView != null) {
+	    		view = convertView;
+	    	} else {
+	    		view = layoutInflater.inflate( R.layout.selectgallery_item, parent, false );
+	    	}
+	    	
+	        TextView textView = (TextView)view.findViewById(R.id.title);
 	        textView.setText(data.get(position).name);
 	        
-	        
-	        return textView;
+	        return view;
 	    }
 
 	}
