@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -11,10 +12,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.TextView;
 
 /**
  * 
@@ -23,65 +26,105 @@ import android.widget.ListView;
  * @license Open Source; 3-clause BSD 
  */
 public class SelectFolderActivity extends Activity {
-
-	ListView listView;
-	List<String> bucketIdList = new ArrayList<String>();
-	List<String> bucketNameList = new ArrayList<String>();
-
+	
+	GridView gridview;
+	ImageAdapter gridViewAdaptor;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.selectgallery);
-
-		listView = (ListView)findViewById(R.id.list);
-
-
-		String[] projection = new String[]{
-				MediaStore.Images.Media.BUCKET_ID,
-				MediaStore.Images.Media.BUCKET_DISPLAY_NAME, 
-		};
-		Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-		Cursor cur = managedQuery(images,
-				projection, // Which columns to return
-						"",         // Which rows to return (all rows)
-						null,       // Selection arguments (none)
-						""          // Ordering
-				);
-
-		Log.i("ListingImages"," query count="+cur.getCount());
-
-		if (cur.moveToFirst()) {
-			String bucket;
-			String bucketId;
-			int bucketColumn = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-			int bucketIdColumn = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_ID);
-
-			do {
-				bucket = cur.getString(bucketColumn);
-				bucketId = cur.getString(bucketIdColumn);
-
-				if (!bucketIdList.contains(bucketId)) {
-					//Log.i("NEWBUCKET"," id="+bucketId+" name="+bucket);
-					bucketIdList.add(bucketId);
-					bucketNameList.add(bucket);
-				}
-			} while (cur.moveToNext());
-
-			ArrayAdapter<String> directoryList = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, bucketNameList);
-			listView.setAdapter(directoryList); 
-
-		}		
-
-		listView.setOnItemClickListener(new OnItemClickListener(){
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Log.i("BUCKET",bucketNameList.get(position));
+		
+	    gridview = (GridView) findViewById(R.id.gridview);
+	    gridViewAdaptor = new ImageAdapter(this);
+	    gridview.setAdapter(gridViewAdaptor);
+		
+	    gridview.setOnItemClickListener(new OnItemClickListener() {
+	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	        	Gallery data = (Gallery)gridViewAdaptor.getItem(position);
 				Intent i = new Intent(SelectFolderActivity.this, MainActivity.class);
-				i.putExtra("bucketID",bucketIdList.get(position));
-				i.putExtra("bucketName",bucketNameList.get(position));
+				i.putExtra("bucketID",data.id);
+				i.putExtra("bucketName", data.name);
 				SelectFolderActivity.this.startActivity(i);
-			}
-		});
+	        }
+	    });
+		
+	}
+	
+	
+	protected class Gallery {
+		public String id;
+		public String name;
+		public Gallery(String id, String name) {
+			super();
+			this.id = id;
+			this.name = name;
+		}
+	}
+	
+	protected class ImageAdapter extends BaseAdapter {
+	    private Context mContext;
+
+	    protected List<Gallery> data = new ArrayList<Gallery>();
+		protected List<String> bucketIdList = new ArrayList<String>();
+
+	    public ImageAdapter(Context c) {
+	        mContext = c;
+	        
+	        String[] projection = new String[]{
+		            MediaStore.Images.Media.BUCKET_ID,
+		            MediaStore.Images.Media.BUCKET_DISPLAY_NAME, 
+		    };
+		    Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+		    Cursor cur = managedQuery(images,
+		            projection, // Which columns to return
+		            "",         // Which rows to return (all rows)
+		            null,       // Selection arguments (none)
+		            ""          // Ordering
+		            );
+
+		    Log.i("ListingImages"," query count="+cur.getCount());
+
+		    if (cur.moveToFirst()) {
+		        String bucket;
+		        String bucketId;
+		        int bucketColumn = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+		        int bucketIdColumn = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_ID);
+		        do {
+		            bucket = cur.getString(bucketColumn);
+		            bucketId = cur.getString(bucketIdColumn);
+		            if (!bucketIdList.contains(bucketId)) {
+		            	//Log.i("NEWBUCKET"," id="+bucketId+" name="+bucket);
+		            	bucketIdList.add(bucketId);
+		            	data.add(new Gallery(bucketId, bucket));
+		            }
+		        } while (cur.moveToNext());
+		    }		
+	        
+	    }
+
+	    public int getCount() {
+	        return data.size();
+	    }
+
+	    public Object getItem(int position) {
+	        return data.get(position);
+	    }
+
+	    public long getItemId(int position) {
+	        return 0;
+	    }
+
+	    // create a new ImageView for each item referenced by the Adapter
+	    public View getView(int position, View convertView, ViewGroup parent) {
+	        TextView textView = new TextView(mContext);
+	        
+	        textView.setText(data.get(position).name);
+	        
+	        
+	        return textView;
+	    }
 
 	}
+	
 
 }
