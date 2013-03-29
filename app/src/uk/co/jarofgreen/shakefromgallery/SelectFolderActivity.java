@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -55,10 +57,12 @@ public class SelectFolderActivity extends Activity {
 	protected class Gallery {
 		public String id;
 		public String name;
-		public Gallery(String id, String name) {
+		public long imageID;
+		public Gallery(String id, String name, String imageID) {
 			super();
 			this.id = id;
 			this.name = name;
+			this.imageID = Long.parseLong(imageID);
 		}
 	}
 	
@@ -74,8 +78,9 @@ public class SelectFolderActivity extends Activity {
 			layoutInflater = (LayoutInflater)c.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 	        
 	        String[] projection = new String[]{
+	        		MediaStore.Images.Media._ID,
 		            MediaStore.Images.Media.BUCKET_ID,
-		            MediaStore.Images.Media.BUCKET_DISPLAY_NAME, 
+		            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
 		    };
 		    Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		    Cursor cur = managedQuery(images,
@@ -90,15 +95,18 @@ public class SelectFolderActivity extends Activity {
 		    if (cur.moveToFirst()) {
 		        String bucket;
 		        String bucketId;
+		        String imageId;
 		        int bucketColumn = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 		        int bucketIdColumn = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_ID);
+		        int imageIDColumn = cur.getColumnIndex(MediaStore.Images.Media._ID);
 		        do {
 		            bucket = cur.getString(bucketColumn);
 		            bucketId = cur.getString(bucketIdColumn);
+		            imageId = cur.getString(imageIDColumn);
 		            if (!bucketIdList.contains(bucketId)) {
 		            	//Log.i("NEWBUCKET"," id="+bucketId+" name="+bucket);
 		            	bucketIdList.add(bucketId);
-		            	data.add(new Gallery(bucketId, bucket));
+		            	data.add(new Gallery(bucketId, bucket, imageId));
 		            }
 		        } while (cur.moveToNext());
 		    }		
@@ -125,8 +133,16 @@ public class SelectFolderActivity extends Activity {
 	    		view = layoutInflater.inflate( R.layout.selectgallery_item, parent, false );
 	    	}
 	    	
+	    	Gallery ourData = data.get(position);
+	    	
 	        TextView textView = (TextView)view.findViewById(R.id.title);
-	        textView.setText(data.get(position).name);
+	        textView.setText(ourData.name);
+	        
+	        ImageView imageView = (ImageView)view.findViewById(R.id.image);
+	        
+	        Bitmap bit = MediaStore.Images.Thumbnails.getThumbnail(mContext.getContentResolver(),ourData.imageID, 
+	        		MediaStore.Images.Thumbnails.MINI_KIND, null);
+	        imageView.setImageBitmap(bit);
 	        
 	        return view;
 	    }

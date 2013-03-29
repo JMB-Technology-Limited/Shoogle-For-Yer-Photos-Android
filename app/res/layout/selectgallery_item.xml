@@ -3,6 +3,11 @@
     android:layout_width="fill_parent"
     android:layout_height="190dp" >
 
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/image"  />
+    
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
