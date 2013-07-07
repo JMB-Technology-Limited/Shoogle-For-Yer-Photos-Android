@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -40,6 +41,8 @@ public class MainActivity extends Activity {
 	Random randomGenerator;
 	TextView mainTextView;
 	Bitmap bit;
+	LoadImageTask loadImageTask;
+	
 	
 	ShakeDetectActivity shakeDetectActivity;
 
@@ -145,6 +148,12 @@ public class MainActivity extends Activity {
 	public void nextPicture() {
 		mainTextView.setVisibility(View.GONE);
 
+		// are we already loading?
+		if (loadImageTask != null && loadImageTask.isRunning()) {
+			return;
+		}
+		
+		// get next index
 		int next;
 		do {
 			next = randomGenerator.nextInt(images.size());
@@ -153,14 +162,42 @@ public class MainActivity extends Activity {
 		lastTriggersSelected.add(Integer.valueOf(next));
 		if (lastTriggersSelected.size() > remmeberLastImages) lastTriggersSelected.remove(0);
 
-		if (bit != null) {
-			bit.recycle();
-		}
-		bit = BitmapFactory.decodeFile(images.get(next));
-		mainImageView.setImageBitmap(bit);
+		// start loading
+		mainImageView.setImageResource(R.drawable.loading);
+		loadImageTask = new LoadImageTask();
+		loadImageTask.execute(images.get(next));
+	
 
 	}
 
+	protected class LoadImageTask extends AsyncTask<String, Integer, Boolean> {
+
+		protected boolean running = false;
+		
+		@Override
+		protected Boolean doInBackground(String... params) {
+			running = true;
+			if (bit != null) {
+				bit.recycle();
+			}
+			bit = BitmapFactory.decodeFile(params[0]);
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			mainImageView.setImageBitmap(bit);
+			running = false;
+		}
+
+		public boolean isRunning() {
+			return running;
+		}
+		
+		
+		
+	}
+	
 
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
