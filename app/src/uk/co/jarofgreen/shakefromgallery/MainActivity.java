@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
 	ImageView mainImageView;
 	Random randomGenerator;
 	TextView mainTextView;
+	Bitmap bit;
 	
 	ShakeDetectActivity shakeDetectActivity;
 
@@ -152,7 +153,10 @@ public class MainActivity extends Activity {
 		lastTriggersSelected.add(Integer.valueOf(next));
 		if (lastTriggersSelected.size() > remmeberLastImages) lastTriggersSelected.remove(0);
 
-		Bitmap bit = BitmapFactory.decodeFile(images.get(next));
+		if (bit != null) {
+			bit.recycle();
+		}
+		bit = BitmapFactory.decodeFile(images.get(next));
 		mainImageView.setImageBitmap(bit);
 
 	}
