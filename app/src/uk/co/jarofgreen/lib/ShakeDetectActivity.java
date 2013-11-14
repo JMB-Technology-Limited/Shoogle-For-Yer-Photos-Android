@@ -94,7 +94,7 @@ public class ShakeDetectActivity implements SensorEventListener {
 	}
 
 	private static final long KEEP_DATA_POINTS_FOR = 1500;
-	private static final long MINIMUM_EACH_DIRECTION = 3;
+	private static final long MINIMUM_EACH_DIRECTION = 7;
 	private static final float POSITIVE_COUNTER_THRESHHOLD = (float) 2.0;
 	private static final float NEGATIVE_COUNTER_THRESHHOLD = (float) -2.0;
 
