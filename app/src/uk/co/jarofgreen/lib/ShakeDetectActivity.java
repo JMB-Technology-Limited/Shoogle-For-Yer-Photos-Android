@@ -27,11 +27,11 @@ public class ShakeDetectActivity implements SensorEventListener {
 
 	public ShakeDetectActivity(Context context) {
 		sensorMgr = (SensorManager) context.getSystemService(Activity.SENSOR_SERVICE);
-		sensorMgr.registerListener(this,sensorMgr.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
+		sensorMgr.registerListener(this,sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
 	}	
 
 	public void onResume() {
-		sensorMgr.registerListener(this,sensorMgr.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
+		sensorMgr.registerListener(this,sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_GAME);
 	}
 
 	public void onPause() {
@@ -64,7 +64,7 @@ public class ShakeDetectActivity implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		if (event.sensor.getType() == SensorManager.SENSOR_ACCELEROMETER) {
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
 			long curTime = System.currentTimeMillis();
 			// if a shake in last X seconds ignore.
